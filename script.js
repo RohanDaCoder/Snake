@@ -91,8 +91,7 @@ var controls = setInterval(() => {
   }
 }, 300);
 
-
-const reload = () => {
+function reload () {
   x = 0;
   y = 0;
   $("#Dead").hide()
@@ -100,3 +99,17 @@ const reload = () => {
   load()
   game.core.loop()
 }
+
+$(document).on("keydown", function(e){
+    if (e.keyCode === 83) {
+      game.movement.down();
+    } else if (e.keyCode == 68) {
+      game.movement.right();
+    } else if (e.keyCode == 65) {
+      game.movement.left();
+    } else if (e.keyCode === 87) {
+      game.movement.up();
+    } else if (e.keyCode === 82) {
+      reload()
+    }
+  })
