@@ -1,0 +1,264 @@
+  
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Snake</title>
+  
+  <!-- HTML -->
+  <script type="text/javascript" src="cdn_modules/jquery@3.6.1/jquery.min.js"></script>
+  
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+  <!-- Custom Styles -->
+  
+<link rel="stylesheet" href="style.css">
+
+  <style>
+    
+* {
+  font-family: 'Poppins', 'sans-serif';
+}
+button {
+  cursor: pointer;
+}
+canvas {
+  background-color: #3e3e3e;
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
+  box-shadow: black 20px 10px 50px;
+  border: black 10px solid;
+  border-radius: 5px;
+}
+#controls {
+  font-weight: bold;
+  background-color: white;
+  border: 3px currentColor solid;
+  padding: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+#up {
+  
+  font-size: 20px;
+  font-weight: bold;
+  background-color: white;
+  border: 3px currentColor solid;
+  padding: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-left: 40%;
+}
+#left {
+  font-size: 20px;
+  font-weight: bold;
+  background-color: white;
+  border: 3px currentColor solid;
+  padding: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-left: 20%;
+  margin-top: 3px;
+}
+#Dead {
+  
+  opacity: 70%;
+  content: "You Died.";
+  height: 100%;
+  width: 100%;
+}
+#deathScreenText {
+  font-weight: bold;
+  font-family: 'Poppins', 'sans-serif';
+  opacity: 1;
+  font-size: 100px;
+  text-align: center;
+  display: flex;
+}
+
+.restart{
+  font-family: 'Poppins', 'sans-serif';
+  height: 40px;
+  width: 100px;
+  display: block;
+  margin-left: 40%;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.loadingScreen {
+  font-weight: bold;
+  font-size: 30px;
+  margin-left: 100px;
+}
+.loading {
+  margin-right: auto;
+  margin-left: auto;
+  color: #1DBCC6;
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="loadingScreen">
+  <p class="loading">Loading Game...</p>
+  <div class="loader"></div>
+  </div>
+<div id="Dead">
+  <p id="deathScreenText">You Died.</p>
+  <button onclick="reload()" class="restart">Restart</button>
+</div>  
+  <div id="game">
+  <canvas id="canvas" height=300 width=300></canvas>
+  <br>
+  <br>
+  
+  <div class="controlButtons">
+    
+    <button class="ctrl" onclick="game.movement.up()" id="up">↑</button>
+    <br>
+    <button class="ctrl" onclick="game.movement.left()" id="left">←</button>
+    <button class="ctrl" onclick="game.movement.down()" id="controls">↓</button>
+    <button class="ctrl" onclick="game.movement.right()" id="controls">→</button>
+
+    
+  </div>
+  </div>
+
+  <!-- Project -->
+  <script defer> 
+  $("#game").hide()
+    
+  
+  async function load() {
+    setTimeout(() => {
+    $(".loadingScreen").fadeOut(500)
+    $("#game").fadeIn(1000)
+  }, 1000)
+  }
+  load()
+  const c = document.getElementById("canvas");
+let ctx = c.getContext("2d");
+let log = console.log;
+let scale = 15;
+const rows = c.height / scale;
+const columns = c.width / scale;
+let speed = 7;
+  let y = 0;
+  let x = 0;
+  let velocity = null;
+  $("#Dead").hide()
+const game = {
+  core: {
+    clearScreen(){
+      ctx.fillStyle = "#3e3e3e"
+      ctx.fillRect(0, 0, c.width, c.height)
+    },
+    draw(){
+      ctx.fillStyle = "yellow"
+      ctx.fillRect(x, y, scale, scale);
+    },
+    loop(){
+      game.core.clearScreen();
+      game.core.draw();
+      setTimeout(() => {
+        log("Updating Screen..")
+        game.core.loop();
+      }, 1000 / speed)
+    },
+    death() {
+      velocity = null;
+        $("#game").fadeOut(1000)
+        //$(".controlButtons").fadeOut(1000)
+        $("#Dead").fadeIn(1000)
+    }
+  },
+  movement: {
+    left(){
+        velocity = "left"
+},
+      right() {
+      if(x > 285) return;
+      if (x < 285) {
+        velocity = "right"
+      }
+      },
+    up(){
+      velocity = "up"
+    },
+    down(){
+      velocity = "down"
+    }
+}
+}
+
+    
+     
+    
+game.core.draw();
+game.core.loop();
+
+
+
+//Touch Controls
+var controls = setInterval(() => {
+  if (velocity === "right") {
+    if(x === 285) return game.core.death()
+    if(x < 285) return x += 15;
+  }
+  if (velocity === "left") {
+    if (x === 0) return game.core.death();
+    if (x > 0) return x = (x - 15);
+  }
+  if (velocity === "down") {
+    if (y === 285) return game.core.death()
+    y += 15;
+  }
+  if (velocity === "up") {
+    if (y === 0) return game.core.death();
+    y = (y - 15)
+    
+  }
+}, 300);
+
+//WASD Controls
+$(document).on("keydown", function(e){
+    if (e.keyCode === 83) {
+      game.movement.down();
+    } else if (e.keyCode == 68) {
+      game.movement.right();
+    } else if (e.keyCode == 65) {
+      game.movement.left();
+    } else if (e.keyCode === 87) {
+      game.movement.up();
+    }
+  })
+
+const reload = () => {
+  x = 0;
+  y = 0;
+  $("#Dead").hide()
+  $(".loadingScreen").fadeIn(0)
+  load()
+  game.core.loop()
+}
+
+  </script>
+</body>
+</html>
