@@ -39,11 +39,163 @@
     <button class="ctrl" onclick="game.movement.left()" id="left">←</button>
     <button class="ctrl" onclick="game.movement.down()" id="controls">↓</button>
     <button class="ctrl" onclick="game.movement.right()" id="controls">→</button>
-
+<button onclick="velocity = null;">Pause</button>
     
   </div>
   </div>
+<script>
+  $("#game").hide()
+  
+  async function load() {
+    setTimeout(() => {
+    $(".loadingScreen").fadeOut(500)
+    $("#game").fadeIn(1000)
+  }, 2000)
+  }
+  load()
+const c = document.getElementById("canvas");
+let ctx = c.getContext("2d");
+let log = console.log;
+let scale = 15;
+const rows = c.height / scale;
+const columns = c.width / scale;
+let speed = 7;
+  let y = 120;
+  let x = 120;
+  let fruitX = 240;
+  let fruitY = 240;
+  let velocity = null;
+  let tileCount = 10;
+  let tileSize = Math.ceil((canvas.width / tileCount) * 5 - 10);
+log(tileSize)
+  $("#Dead").hide()
+  class Fruit{
+    constructor(ex, ey) {
+      if(!ex || !ey) return SyntaxError("No Fruit X Y")
+      fruitX = ex;
+      fruitY = ey;
+      
+      this.x = ex;
+      this.y = ey;
+      ctx.fillStyle = "red";
+      ctx.fillRect(this.x, this.y, scale, scale);
+      
+    }
+  }
+  
+const game = {
+  core: {
+    checkAppleCollision() {
+      if(fruitX === x && fruitY === y){
+        fruitX = Math.floor(Math.ceil(Math.random() * 19) * 15)
+        fruitY = Math.floor(Math.ceil(Math.random() * 19) * 15)
+      }
+    },
+    clearScreen(){
+      ctx.fillStyle = "#3e3e3e"
+      ctx.fillRect(0, 0, c.width, c.height);
+    },
+    draw(){
+      //Snake Head
+      ctx.fillStyle = "yellow"
+      ctx.fillRect(x, y, scale, scale);
+      
+      //Fruit
+      new Fruit(fruitX, fruitY);
+    },
+    loop(){
+      game.core.clearScreen();
+      game.core.checkAppleCollision();
+      game.core.draw();
+      setTimeout(() => {
+        log("Updating Screen..")
+        game.core.loop();
+      }, 1000 / speed)
+    },
+    death() {
+      velocity = null;
+      new Fruit(240, 240)
+        $("#game").fadeOut(1000)
+        //$(".controlButtons").fadeOut(1000)
+        $("#Dead").fadeIn(1000)
+    }
+  },
+  movement: {
+    left(){
+      
+        velocity = "left"
+      },
+      right() {
+      if(x > 285) return;
+      if (x < 285) {
+        velocity = "right"
+      }
+      },
+    up(){
+      velocity = "up"
+    },
+    down(){
+      velocity = "down"
+    },
+    test(){log(`x: ${x} y: ${y}`)}
+}
+}
 
+    class SnakePart {
+      constructor(ex, ey) {
+        this.x = ex;
+        this.y = ey;
+      }
+    }
+    
+game.core.draw();
+game.core.loop();
+var controls = setInterval(() => {
+  
+  if (velocity === "right") {
+    if(x === 285) return game.core.death()
+    if(x < 285) return x += 15;
+  }
+  if (velocity === "left") {
+    if (x === 0) return game.core.death();
+    if (x > 0) return x = (x - 15);
+  }
+  if (velocity === "down") {
+    if (y === 285) return game.core.death()
+    y += 15;
+  }
+  if (velocity === "up") {
+    if (y === 0) return game.core.death();
+    y = (y - 15)
+    
+  }
+}, 300);
+
+function reload () {
+  x = 120;
+  y = 120;
+  $("#Dead").hide()
+  $(".loadingScreen").fadeIn(0)
+  load()
+  game.core.loop()
+}
+
+$(document).on("keydown", function(e){
+    if (e.keyCode === 83) {
+      game.movement.down();
+    } else if (e.keyCode == 68) {
+      game.movement.right();
+    } else if (e.keyCode == 65) {
+      game.movement.left();
+    } else if (e.keyCode === 87) {
+      game.movement.up();
+    } else if (e.keyCode === 82) {
+      game.core.death()
+      reload()
+    }
+  })
+
+</script>
   <!-- Project -->
   
 </body>
